@@ -23,9 +23,16 @@ if st.button("Execute"):
     else:
         with st.spinner("Processing..."):
 
-            main_chain = build_chain(video_id)
+            try:
+                main_chain = build_chain(video_id)
 
-            response = main_chain.invoke(question)
+                if main_chain is None:
+                    st.error("Could not create chatbot.")
+                else:
+                    response = main_chain.invoke(question)
+                    st.success("Answer Generated")
+                    st.write(response)
 
-            st.success("Answer Generated")
-            st.write(response)
+            except Exception as e:
+                st.error(str(e))
+                

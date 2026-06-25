@@ -8,8 +8,16 @@ from langchain_community.vectorstores import FAISS
 from langchain_core.prompts import PromptTemplate
 from langchain_groq import ChatGroq
 from langchain_core.output_parsers import StrOutputParser
+import streamlit as st
 
 load_dotenv()
+
+@st.cache_resource
+def get_embedding_model():
+    return HuggingFaceEmbeddings(
+        model_name="sentence-transformers/all-MiniLM-L6-v2"
+    )
+
 
 #INDEXING
 
@@ -26,9 +34,7 @@ def build_chain(video_id):
         print(transcript[:500])
 
     except Exception as e:
-        print(f"Error type: {type(e).__name__}")
-        print(f"Error message: {e}")
-        exit()
+        raise Exception(f"Transcript Error: {e}")
 
 
 
@@ -41,7 +47,7 @@ def build_chain(video_id):
         exit(1)
 
 #Embedding
-    embedding=HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+    embedding = get_embedding_model()
     print("Embeddings model loaded successfully")
     vector_store=FAISS.from_documents(chunks, embedding)
     print("Vector store created successfully")
